@@ -166,17 +166,6 @@ class PlaintextMessage(Message):
     self.key = key
     self.message_text_encrypted = self.apply_vigenere(key)
 
-
-# def generate_powerset(input_set):
-#   if len(input_set) == 0:
-#     return [[]]
-#   else:
-#     powerset_list = generate_powerset(input_set[:-1])  # Recursion
-#     for counter in range(len(powerset_list)):
-#       powerset_list.append(powerset_list[counter] + [input_set[-1]])
-#     return powerset_list
-
-
 class CiphertextMessage(Message):
   def __init__(self, text):
     '''
@@ -214,19 +203,18 @@ class CiphertextMessage(Message):
     Returns: a tuple of the best key used to decrypt the message
     and the decrypted message text using that key
     '''
-    key = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    key_powersets = generate_powerset(key)
+    key_values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     key_list = []
+    for first in key_values:
+      key_list.append([first])
+      for second in key_values:
+        if not (first == second):
+          key_list.append([first,second])
+        for third in key_values:
+          if not (first == second and first == third):
+            key_list.append([first, second,third])
     best_score = 0
     best_key = []
-    for value in key_powersets:
-      if len(value) > 0 and len(value) <= 3:
-        key_list.append(value)
-    if [7,8,12] in key_list:
-      print("True")
-      print(key_list.index([8,11, 12]))
-      print(key_list.index([7,8,12]))
-      print(len(key_list))
     for key in key_list:
       score = 0
       word_list = []
@@ -237,13 +225,12 @@ class CiphertextMessage(Message):
       for word in word_list:
         if is_word(self.valid_words,word):
           score+=1
-      if score >= best_score:
+      if score > best_score:
         best_score = score
         best_key = key
 
     negative_key = [element * -1 for element in best_key]
     decrypted_message = self.apply_vigenere(negative_key)
-
     return (best_key, decrypted_message)
 
 
